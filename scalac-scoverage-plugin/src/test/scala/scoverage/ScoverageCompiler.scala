@@ -44,7 +44,11 @@ object ScoverageCompiler {
   }
 
   private def getScalaJars: List[File] = {
-    val scalaJars = List("scala-compiler", "scala-library", "scala-reflect")
+    val scalaJars = if (ScalaVersion startsWith "2") {
+      List("scala-compiler", "scala-library", "scala-reflect")
+    } else {
+      List("dotty-compiler", "dotty-library", "tasty-reflect")
+    }
     scalaJars.map(findScalaJar)
   }
 

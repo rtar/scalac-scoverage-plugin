@@ -6,12 +6,12 @@ import sbtcrossproject.CrossProject
 import sbtcrossproject.CrossType
 
 val Org = "org.scoverage"
-val ScalatestVersion = "3.0.8"
+val ScalatestVersion = "3.1.1"
 
 val appSettings = Seq(
     organization := Org,
     scalaVersion := "2.12.8",
-    crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.10", "2.13.1"),
+    crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.10", "2.13.1", "0.22.0-RC1"),
     fork in Test := false,
     publishMavenStyle := true,
     publishArtifact in Test := false,
@@ -74,6 +74,7 @@ lazy val runtime = CrossProject("scalac-scoverage-runtime", file("scalac-scovera
       libraryDependencies += "org.scalatest" %% "scalatest" % ScalatestVersion % "test"
     )
     .jsSettings(
+      crossScalaVersions -= "0.22.0-RC1",
       libraryDependencies += "org.scalatest" %%% "scalatest" % ScalatestVersion % "test",
       scalaJSStage := FastOptStage
     )
@@ -88,7 +89,11 @@ lazy val plugin = Project("scalac-scoverage-plugin", file("scalac-scoverage-plug
     .settings(
       libraryDependencies ++= Seq(
         "org.scalatest" %% "scalatest" % ScalatestVersion % "test",
-        "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided"
+        if (scalaVersion.value startsWith "2") {
+          "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided"
+        } else {
+          "ch.epfl.lamp" %% "dotty-compiler" % scalaVersion.value % "provided"
+        }
       )
     )
     .settings(
